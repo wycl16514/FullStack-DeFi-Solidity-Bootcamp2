@@ -193,3 +193,33 @@ hex format of value 5678, and we put it as the value of data field in sendTransa
 As you can see, sendTransaction with given data is just like calling setMyUint() function with value 5678! Actually the value for the data field at the beginning "0xe492fd84" is called
 the signature of function setMyUint(), if we use web3.util.sha3 hash to compute the result of "setMyUint(uint256)", then for the first 4 bytes of the result would be "0x4e92fd84",
 
+Let's use a small project to wrap up this section. We will going to do a wallet app of smart contract, you can deposit money or withdraw from it, you can see the
+balance of the wallet, and you can send moneny to given address from the wallet. Create a sol file name SmallWallet.sol and add the following code:
+```sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.15;
+
+contract SmallWallet {
+    uint public balanceValue;
+
+    function deposit() public payable {
+        balanceValue += msg.value;
+    }
+
+    function balance() public view returns (uint) {
+        //not balanceValue here
+        return address(this).balance;
+    }
+
+    function withrawOnce() public {
+        address payable to = payable(msg.sender);
+        to.transfer(this.balance());
+    }
+
+    function withdrawToAddress(address payable to) public {
+        to.transfer(this.balance());
+    }
+}
+```
+As homework go to deploy the contract to hardhat node and call its functions aboved to deposit and withdraw or transanfer money to different account.
+
