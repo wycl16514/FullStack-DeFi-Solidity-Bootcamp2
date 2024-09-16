@@ -53,3 +53,48 @@ undefined
 true
 ```
 
+Let's see some other data structure in solidity. One of most used technique in smart contract is to leverage another contract do some job. If you are familiar with common programming 
+language like python, java, then you may know that we can initailize a sub process to do some task. In solidity, one contract to initalize another contract and ask it to do something
+is just like construct a sub process for some tasks in common programming language, let's see how we can do it:
+
+```sol
+contract PaymentRecord {
+    address public from;
+    uint public amount;
+
+    constructor(address _from, uint _amount) {
+        from = _from;
+        amount = _amount;
+    }
+}
+
+contract MappingExample {
+    ...
+     //default to null
+    PaymentRecord public payment;
+    function payContract() public payable {
+        payment = new PaymentRecord(msg.sender, msg.value);
+    }
+```
+In aboved code, we define another contract in the same solidity file, and the new contract is a new type, then we define a payment object with name payment in the contract of MappingExample
+, then we add a new payable function payContract, in the function, we initailize an instance of PaymentRecord and using the sender and value received in the payContract function to 
+initialize it.
+
+Let's see how we can run the code above. First we deploy the contract, and call the payContract method:
+```js
+> const contract = await ethers.getContractAt("MappingExample", "0x610178dA211FEF7D417bC0e6FeD39F05609AD788")
+undefined
+> await contract.payContract({value: ethers.parseEther("1.0")})
+> await contract.payment()
+'0x6F1216D1BFe15c98520CA1434FC1d9D57AC95321'
+> const payment = await ethers.getContractAt("PaymentRecord","0x6F1216D1BFe15c98520CA1434FC1d9D57AC95321")
+> await payment.from()
+'0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+> await payment.amount()
+1000000000000000000n
+```
+From above output, we can see the address for sub contract which is the instance of PaymentRecord is 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, then we can get the sub contract and aceess
+to its value like from and amount.
+
+We can do the same job by using struct from solidity.
+
