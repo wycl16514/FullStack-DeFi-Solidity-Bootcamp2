@@ -96,5 +96,29 @@ undefined
 From above output, we can see the address for sub contract which is the instance of PaymentRecord is 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, then we can get the sub contract and aceess
 to its value like from and amount.
 
-We can do the same job by using struct from solidity.
+We can do the same job by using struct from solidity, add the following piece of code to our contract:
+```js
+ struct PaymentRecordStruct {
+        address from;
+        uint amount;
+    }
+
+    PaymentRecordStruct public paymentStruct;
+
+    function payContractWithStruct() public payable {
+        paymentStruct = PaymentRecordStruct(msg.sender, msg.value);
+    }
+```
+Then we run the contract at local console as following:
+```js
+> const struct = await ethers.getContractAt("MappingExample","0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0")
+undefined
+> await struct.payContractWithStruct({value:ethers.parseEther("2.0")})
+> await struct.paymentStruct()
+Result(2) [
+  '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+  2000000000000000000n
+]
+```
+As you can see, the Result(2) contains info for the result, the first one is the field for from, and the second one is the value received by the function.
 
